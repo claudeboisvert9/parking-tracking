@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+-->
+<html>
+    <head>
+        <title>Parking Tracking</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" >
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools-yui-compressed.js"></script>
+        <script src="scripts/fileProcessing.js" ></script>
+    </head>
+
+    <body onload="getLocations();">
+        <!--File output on screen-->
+        <!--
+         <div id="container">
+             <hr/>   
+             <h3>Content of the text file:</h3>
+             <div id="main">
+                 ...
+             </div>
+             <p>End of content.</p>
+         </div>
+        -->
+
+        <!--
+                <div id="selectCity" style="width: 100px; height: 100px;"></div>
+                <h3>Choose a city to view.</h3>
+                        <select id="cityList">
+                        <option value="1">All Cities</option>
+                        <option value="2">Lachine</option>
+                        <option value="3">Montreal West</option>
+                        <option value="4">St-Pierre</option>
+                        </select>
+                </div>
+        -->
+        <!--
+        <textarea rows="5" cols="25" id="serverResponse"></textarea>
+        <textarea rows="5" cols="25" id="myResponse"></textarea>
+        -->
+
+        <!--Map-->
+        <div id="map" style="width: 1000px; height: 700px;"></div>	
+        <script src="scripts/fileProcessing.js" ></script>
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAz7J29tWo_gomrCedd29g_Nzk-F6yVO90&callback=DisplayMap">
+        </script>
+    </body>
+</html>
