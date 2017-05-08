@@ -5,16 +5,16 @@ var glocations = new Array();
 var serverResponse = "pouf";
 
 /*
-function onloadFunction {
-	getLocations();
-	buildLocationsList(serverResponse);
-//    displayContents(serverResponse);
-	getSignsInfo();
-	serverResponse = "pouf";
-	buildSignsInfoList(serverResponse);
-	displayMap();
-}
-*/
+ function onloadFunction {
+ getLocations();
+ buildLocationsList(serverResponse);
+ //    displayContents(serverResponse);
+ getSignsInfo();
+ serverResponse = "pouf";
+ buildSignsInfoList(serverResponse);
+ displayMap();
+ }
+ */
 
 /* Get locations from server
  * @returns {}
@@ -24,7 +24,7 @@ function getLocations() {
     window.addEvent("domready", function () {
         //Creating a new AJAX request that will request 'CityLocations.txt' from the current directory
         var csvRequest = new Request({
-            url: "files/CityLocations.txt",
+            url: "files/CitySignInfos.txt",
             async: false,
             onSuccess: function (response) {
                 //The response text is available in the 'response' variable
@@ -57,9 +57,9 @@ function getSignsInfo() {
                 // $("serverResponse").value = response;
                 var servResponse = response;
                 serverResponse = servResponse.replace("\r\n", "\n");
-				buildSignsInfoList(txt)
-				//build signsInfoList by loop on lines
-				
+                buildSignsInfoList(txt)
+                //build signsInfoList by loop on lines
+
                 // $("myResponse").value = serverResponse;
             }
         }).send(); //Don't forget to send our request!
@@ -132,7 +132,7 @@ function buildLocationsList(txt) {
     for (var i = 0; i < arrayLength; i++) {
         var locations = locationsRawData[i].split("_");
         // if not null
-        glocations.push(['Parking', locations[0], locations[1], arrayLength - i]);
+        glocations.push(['Parking', locations[0], locations[1], locations[2], arrayLength - i]);
     }
 }
 
@@ -148,39 +148,56 @@ function buildSignsInfoList(txt) {
 }
 
 function displayMap() {
-	/*
-	var markerIcon = {
-  url: 'http://image.flaticon.com/icons/svg/252/252025.svg',
-  scaledSize: new google.maps.Size(80, 80),
-  origin: new google.maps.Point(0, 0),
-  anchor: new google.maps.Point(32,65),
-  labelOrigin: new google.maps.Point(40,33)
-};
-
-var markerLabel = 'GO!';
-var marker = new google.maps.Marker({
-  map: map,
-  animation: google.maps.Animation.DROP,
-  position: markerLatLng,
-  icon: markerIcon,
-  label: {
-    text: markerLabel,
-    color: "#eb3a44",
-    fontSize: "16px",
-    fontWeight: "bold"
-  }
-});
-	*/
+    /*
+     var markerIcon = {
+     url: 'http://image.flaticon.com/icons/svg/252/252025.svg',
+     scaledSize: new google.maps.Size(80, 80),
+     origin: new google.maps.Point(0, 0),
+     anchor: new google.maps.Point(32,65),
+     labelOrigin: new google.maps.Point(40,33)
+     };
+     
+     var markerLabel = 'GO!';
+     var marker = new google.maps.Marker({
+     map: map,
+     animation: google.maps.Animation.DROP,
+     position: markerLatLng,
+     icon: markerIcon,
+     label: {
+     text: markerLabel,
+     color: "#eb3a44",
+     fontSize: "16px",
+     fontWeight: "bold"
+     }
+     });
+     */
     var map = new google.maps.Map(document.getElementById('map'),
-            {zoom: 15,
-                center: new google.maps.LatLng(45.448, -73.649),
+            {   zoom: 15,
+                center: new google.maps.LatLng(45.4701204, -73.64414631),
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             });
+            
     var infowindow = new google.maps.InfoWindow();
     var marker, i;
+    var signIcon, signLbl;
     for (i = 0; i < glocations.length; i++) {
+        signIcon = null;
+        signLbl = glocations[i][3].toString();
+        switch (signLbl) {
+            case "NoParking":
+                signIcon = 'images/NoParking.png';
+                break;
+            case "ParkingAllowed":
+                signIcon = 'images/ParkingAllowed.png';
+                break;
+            default:
+                signIcon = null;
+                break;
+        }
         marker = new google.maps.Marker({
             position: new google.maps.LatLng(glocations[i][1], glocations[i][2]),
+            //label: signLbl,
+            icon: signIcon,
             map: map
         });
     }
