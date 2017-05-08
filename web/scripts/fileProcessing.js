@@ -188,7 +188,7 @@ function displayMap() {
                 signIcon = 'images/NoParking.png';
                 break;
             case "ParkingAllowed":
-                signIcon = 'images/ParkingAllowed.png';
+                signIcon = 'images/ParkingOK.png';
                 break;
             default:
                 signIcon = null;
