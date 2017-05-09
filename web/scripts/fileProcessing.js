@@ -1,5 +1,7 @@
 /* Get locations file name
  */
+var TEST_MODE = 0;
+
 var reader; //GLOBAL File Reader object for demo purpose only
 var glocations = new Array();
 var serverResponse = "pouf";
@@ -20,11 +22,17 @@ var serverResponse = "pouf";
  * @returns {}
  */
 function getLocations() {
+    urlParam = "files/CityLocations.txt";
+    if (TEST_MODE) {
+        urlParam = "files/CitySignInfos.txt";
+        //urlParam = "files/test.txt";
+    }
+    
 //This event is called when the DOM is fully loaded
     window.addEvent("domready", function () {
         //Creating a new AJAX request that will request 'CityLocations.txt' from the current directory
         var csvRequest = new Request({
-            url: "files/CitySignInfos.txt",
+            url: urlParam,
             async: false,
             onSuccess: function (response) {
                 //The response text is available in the 'response' variable
@@ -39,31 +47,6 @@ function getLocations() {
 //    displayContents(serverResponse);
     buildLocationsList(serverResponse);
     displayMap();
-}
-
-/* Get sign data from server
- * @returns {}
- */
-function getSignsInfo() {
-//This event is called when the DOM is fully loaded
-    window.addEvent("domready", function () {
-        //Creating a new AJAX request that will request 'SignsInfo.txt' from the current directory
-        var csvRequest = new Request({
-            url: "files/SignsInfo.txt.txt",
-            async: false,
-            onSuccess: function (response) {
-                //The response text is available in the 'response' variable
-                //Set the value of the textarea with the id 'csvResponse' to the response
-                // $("serverResponse").value = response;
-                var servResponse = response;
-                serverResponse = servResponse.replace("\r\n", "\n");
-                buildSignsInfoList(txt)
-                //build signsInfoList by loop on lines
-
-                // $("myResponse").value = serverResponse;
-            }
-        }).send(); //Don't forget to send our request!
-    });
 }
 
 /**
@@ -126,69 +109,46 @@ function displayContents(txt) {
 }
 
 function buildLocationsList(txt) {
+    console.log(" start buildLocationsList");
     var locationsRawData = txt.split("\n");
     //loop on array
     var arrayLength = locationsRawData.length;
     for (var i = 0; i < arrayLength; i++) {
         var locations = locationsRawData[i].split("_");
         // if not null
-        glocations.push(['Parking', locations[0], locations[1], locations[2], arrayLength - i]);
-    }
-}
-
-function buildSignsInfoList(txt) {
-    var signRawData = txt.split("\n");
-    //loop on array
-    var arrayLength = locationsRawData.length;
-    for (var i = 0; i < arrayLength; i++) {
-        var locations = locationsRawData[i].split("_");
-        // if not null
-        glocations.push(['Parking', locations[0], locations[1], arrayLength - i]);
+        if (TEST_MODE) {
+            glocations.push(['Parking', locations[0], locations[1], locations[2], arrayLength - i]);
+        } else {
+            glocations.push(['Parking', locations[0], locations[1], 'NoParkingTime', arrayLength - i]);
+        }
     }
 }
 
 function displayMap() {
-    /*
-     var markerIcon = {
-     url: 'http://image.flaticon.com/icons/svg/252/252025.svg',
-     scaledSize: new google.maps.Size(80, 80),
-     origin: new google.maps.Point(0, 0),
-     anchor: new google.maps.Point(32,65),
-     labelOrigin: new google.maps.Point(40,33)
-     };
-     
-     var markerLabel = 'GO!';
-     var marker = new google.maps.Marker({
-     map: map,
-     animation: google.maps.Animation.DROP,
-     position: markerLatLng,
-     icon: markerIcon,
-     label: {
-     text: markerLabel,
-     color: "#eb3a44",
-     fontSize: "16px",
-     fontWeight: "bold"
-     }
-     });
-     */
     var map = new google.maps.Map(document.getElementById('map'),
-            {   zoom: 15,
+            {zoom: 15,
                 center: new google.maps.LatLng(45.4701204, -73.64414631),
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             });
-            
     var infowindow = new google.maps.InfoWindow();
+
     var marker, i;
     var signIcon, signLbl;
     for (i = 0; i < glocations.length; i++) {
         signIcon = null;
         signLbl = glocations[i][3].toString();
         switch (signLbl) {
-            case "NoParking":
-                signIcon = 'images/NoParking.png';
+            case "NoParkingAlways":
+                signIcon = 'images/NoParkingAlways.png';
                 break;
-            case "ParkingAllowed":
-                signIcon = 'images/ParkingOK.png';
+            case "NoParkingTime":
+                signIcon = 'images/NoParkingTime.png';
+                break;
+            case "ParkingAlways":
+                signIcon = 'images/ParkingAlways.png';
+                break;
+            case "ParkingTime":
+                signIcon = 'images/ParkingTime.png';
                 break;
             default:
                 signIcon = null;
@@ -200,7 +160,30 @@ function displayMap() {
             icon: signIcon,
             map: map
         });
-    }
+        /*
+         var markerIcon = {
+         url: 'http://image.flaticon.com/icons/svg/252/252025.svg',
+         scaledSize: new google.maps.Size(80, 80),
+         origin: new google.maps.Point(0, 0),
+         anchor: new google.maps.Point(32, 65),
+         labelOrigin: new google.maps.Point(40, 33)
+         };
+         
+         var markerLabel = 'GO!';
+         var marker = new google.maps.Marker({
+         map: map,
+         animation: google.maps.Animation.DROP,
+         position: markerLatLng,
+         icon: markerIcon,
+         label: {
+         text: markerLabel,
+         color: "#eb3a44",
+         fontSize: "16px",
+         fontWeight: "bold"
+         }
+         });
+         */
+    } //displayMap()
 
     google.maps.event.addListener(marker, 'click', (function (marker, i) {
         return function () {
