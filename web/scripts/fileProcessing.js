@@ -2,8 +2,28 @@
  */
 var TEST_MODE = 0;
 
+if (TEST_MODE) {
+    urlParam = "files/CitySignInfos.txt";
+    var iDB = 0;
+    var iColl = 1;
+    var iLat = 0;
+    var iLong = 1;
+    var iCity = 4;
+    var iIcon = 2;
+} else {
+    urlParam = "files/CityLocations.txt";
+    var iDB = 0, iColl = 0, iLat = 0, iLong = 1, iCity = 0, iIcon = 0;
+}
+
 var reader; //GLOBAL File Reader object for demo purpose only
 var glocations = new Array();
+/*  glocation[0] db
+ *  [1] collection
+ *  [2] latitude 
+ *  [3] longitude 
+ *  [4] city
+ *  [5] icon
+ */
 var serverResponse = "pouf";
 
 /*
@@ -22,12 +42,8 @@ var serverResponse = "pouf";
  * @returns {}
  */
 function getLocations() {
-    urlParam = "files/CityLocations.txt";
-    if (TEST_MODE) {
-        urlParam = "files/CitySignInfos.txt";
-        //urlParam = "files/test.txt";
-    }
-    
+    console.log("start getLocations");
+
 //This event is called when the DOM is fully loaded
     window.addEvent("domready", function () {
         //Creating a new AJAX request that will request 'CityLocations.txt' from the current directory
@@ -44,7 +60,7 @@ function getLocations() {
             }
         }).send(); //Don't forget to send our request!
     });
-//    displayContents(serverResponse);
+    //displayContents(serverResponse); // keep for debugging
     buildLocationsList(serverResponse);
     displayMap();
 }
@@ -71,7 +87,6 @@ function readText(filePath) {
         reader.onload = function (e) {
             output = e.target.result;
             //displayContents(output);
-
             buildLocationsList(output);
             displayMap();
         };//end onload()
@@ -83,8 +98,7 @@ function readText(filePath) {
             var file = reader.OpenTextFile(filePath, 1); //ActiveX File Object
             output = file.ReadAll(); //text contents of file
             file.Close(); //close file "input stream"
-            //displayContents(output);
-
+            displayContents(output);
             buildLocationsList(output);
             displayMap();
         } catch (e) {
@@ -109,7 +123,7 @@ function displayContents(txt) {
 }
 
 function buildLocationsList(txt) {
-    console.log(" start buildLocationsList");
+    console.log("start buildLocationsList");
     var locationsRawData = txt.split("\n");
     //loop on array
     var arrayLength = locationsRawData.length;
@@ -117,9 +131,11 @@ function buildLocationsList(txt) {
         var locations = locationsRawData[i].split("_");
         // if not null
         if (TEST_MODE) {
-            glocations.push(['Parking', locations[0], locations[1], locations[2], arrayLength - i]);
+            //latitude, long., icon, zIndex
+            glocations.push([locations[iLat], locations[iLong], locations[iIcon], arrayLength - i]);
+            //glocations.push([locations[0], locations[1], 'NoParkingTimeRestriction.png', arrayLength - i]);
         } else {
-            glocations.push(['Parking', locations[0], locations[1], 'NoParkingTime', arrayLength - i]);
+            glocations.push([locations[iLat], locations[iLong], 'NoParkingTimeRestriction.png', arrayLength - i]);
         }
     }
 }
@@ -133,30 +149,22 @@ function displayMap() {
     var infowindow = new google.maps.InfoWindow();
 
     var marker, i;
-    var signIcon, signLbl;
+    var signIcon;    
     for (i = 0; i < glocations.length; i++) {
-        signIcon = null;
-        signLbl = glocations[i][3].toString();
-        switch (signLbl) {
-            case "NoParkingAlways":
-                signIcon = 'images/NoParkingAlways.png';
-                break;
-            case "NoParkingTime":
-                signIcon = 'images/NoParkingTime.png';
-                break;
-            case "ParkingAlways":
-                signIcon = 'images/ParkingAlways.png';
-                break;
-            case "ParkingTime":
-                signIcon = 'images/ParkingTime.png';
-                break;
-            default:
-                signIcon = null;
-                break;
+        var signIconDir = 'images/';
+        if (TEST_MODE) {
+            var lat = glocations[i][iLat];
+            var long = glocations[i][iLong];
+            signIcon = signIconDir + glocations[i][iIcon];
+           //signIcon = signIconDir + 'NoParkingTimeRestriction.png';
+        } else {
+            var lat = glocations[i][iLat];
+            var long = glocations[i][iLong];
+            signIcon = signIconDir + 'NoParkingTimeRestriction.png';
         }
         marker = new google.maps.Marker({
-            position: new google.maps.LatLng(glocations[i][1], glocations[i][2]),
-            //label: signLbl,
+            position: new google.maps.LatLng(lat, long),
+            //label: signIcon,
             icon: signIcon,
             map: map
         });
